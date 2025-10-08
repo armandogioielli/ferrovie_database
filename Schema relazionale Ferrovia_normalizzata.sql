@@ -1,14 +1,15 @@
 --Creazione tabella Provincia
 CREATE TABLE Provincia (
-    sigla CHAR(2) PRIMARY KEY,
-    nome VARCHAR(50) NOT NULL
+    id_provincia SERIAL PRIMARY KEY,
+    sigla VARCHAR(2) NOT null,
+    denominazione VARCHAR(50) NOT NULL
 );
 
 --Creazione tabella Comune
 CREATE TABLE Comune (
     id_comune SERIAL PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
-    sigla_provincia CHAR(2) NOT NULL REFERENCES Provincia(sigla)
+    provincia INTEGER NOT NULL REFERENCES Provincia(id_provincia)
 );
 
 --Creazione tabella TipologiaTreno
@@ -26,7 +27,7 @@ CREATE TABLE TipoAlimentazione (
 --Creazione tabella StatoPrenotazione
 CREATE TABLE StatoPrenotazione (
     id_stato SERIAL PRIMARY KEY,
-    stato VARCHAR(20) NOT NULL CHECK (tipo IN ('IN PAGAMENTO', 'PAGATA', 'SCADUTA'))
+    stato VARCHAR(20) NOT NULL CHECK (stato IN ('IN PAGAMENTO', 'PAGATA', 'SCADUTA'))
 );
 
 --Creazione tabella TipologiaTreno
@@ -83,11 +84,10 @@ CREATE TABLE Prenotazione (
     data_prenotazione   DATE NOT NULL,
     data_partenza       DATE NOT NULL,
     ora_partenza        TIME,
-    stato_prenotazione  VARCHAR(20) CHECK (stato_prenotazione IN ('CREATA', 'PAGATA', 'ANNULLATA')),
     importo             DECIMAL(8,2),
     numero_passeggeri   INTEGER CHECK (numero_passeggeri > 0),
     numero_cambi        INTEGER DEFAULT 0,
-    stato_prenotazione VARCHAR(20) REFERENCES StatoPrenotazione(stato),
+    stato_prenotazione  INTEGER REFERENCES StatoPrenotazione(id_stato),
     id_passeggero       INTEGER NOT NULL REFERENCES Passeggero(id_passeggero)
         ON UPDATE CASCADE ON DELETE CASCADE
 );
@@ -147,7 +147,7 @@ CREATE TABLE Treno (
     numero_posti        INTEGER CHECK (numero_posti > 0),
     capienza            INTEGER CHECK (capienza > 0),
     id_tipologia INTEGER REFERENCES TipologiaTreno(id_tipologia),
-    id_alimentazione INTEGER REFERENCES TipoAlimentazione(id_alimentazione)
+    id_alimentazione INTEGER REFERENCES TipoAlimentazione(id_alimentazione),
     anno_costruzione    INTEGER
 );
 
@@ -168,7 +168,7 @@ CREATE TABLE Dipendente (
     sesso               CHAR(1) CHECK (sesso IN ('M', 'F')),
     data_nascita        DATE,
     data_assunzione     DATE NOT NULL,
-    ruolo               REFERENCES Ruolo(id_ruolo) ON UPDATE CASCADE ON DELETE CASCADE
+    ruolo               INTEGER REFERENCES Ruolo(id_ruolo) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 --Creazione tabella Lavora
